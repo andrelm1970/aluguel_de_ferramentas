@@ -1,0 +1,191 @@
+openapi: 3.0.3
+info:
+  title: API de Aluguel de Ferramentas
+  description: API REST para gerenciamento de usuários, inventário e aluguéis de ferramentas.
+  version: 1.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/ifsc-13d/aluguel/1.0.0
+  - url: https://aluguelferramentas.com
+paths:
+  # =========================================================================
+  # ENTIDADE: USUÁRIOS
+  # =========================================================================
+  /usuarios:
+    get:
+      summary: Lista todos os usuários
+      responses:
+        '200':
+          description: Lista de usuários retornada com sucesso
+        '500':
+          description: Erro interno no servidor
+    post:
+      summary: Cadastra um novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nome, email, senha]
+              properties:
+                nome: { type: string, example: "Carlos Silva" }
+                email: { type: string, example: "carlos.silva@estudante.com" }
+                senha: { type: string, example: "senha123" }
+                telefone: { type: string, example: "11999998888" }
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+        '400':
+          description: Dados inválidos ou e-mail já cadastrado
+
+  /usuarios/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer }
+    put:
+      summary: Atualiza os dados de um usuário existente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome: { type: string }
+                telefone: { type: string }
+      responses:
+        '200':
+          description: Usuário atualizado com sucesso
+        '404':
+          description: Usuário não encontrado
+    delete:
+      summary: Exclui um usuário do sistema
+      responses:
+        '200':
+          description: Usuário removido com sucesso
+        '404':
+          description: Usuário não encontrado
+
+  # =========================================================================
+  # ENTIDADE: INVENTÁRIO
+  # =========================================================================
+  /inventario:
+    get:
+      summary: Lista todos os itens do inventário disponível
+      responses:
+        '200':
+          description: Lista de itens retornada com sucesso
+    post:
+      summary: Cadastra um novo item no inventário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id_usuario, nome_item, preco_diaria]
+              properties:
+                id_usuario: { type: integer, example: 1 }
+                nome_item: { type: string, example: "Furadeira de Impacto Bosch" }
+                descricao: { type: string, example: "Acompanha jogo de brocas." }
+                preco_diaria: { type: number, example: 35.00 }
+      responses:
+        '201':
+          description: Item cadastrado com sucesso
+        '400':
+          description: Dados de cadastro inválidos
+
+  /inventario/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer }
+    put:
+      summary: Atualiza informações de um item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome_item: { type: string }
+                preco_diaria: { type: number }
+                status_disponibilidade: { type: boolean }
+      responses:
+        '200':
+          description: Item atualizado com sucesso
+        '404':
+          description: Item não encontrado
+    delete:
+      summary: Remove um item do inventário
+      responses:
+        '200':
+          description: Item deletado com sucesso
+        '409':
+          description: Não é possível deletar um item associado a um aluguel ativo
+
+  # =========================================================================
+  # ENTIDADE: ALUGUÉIS
+  # =========================================================================
+  /alugueis:
+    get:
+      summary: Lista o histórico geral de aluguéis
+      responses:
+        '200':
+          description: Lista de aluguéis recuperada com sucesso
+    post:
+      summary: Registra um novo pedido de aluguel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id_usuario, id_item, data_inicio, data_fim, valor_total]
+              properties:
+                id_usuario: { type: integer, example: 2 }
+                id_item: { type: integer, example: 101 }
+                data_inicio: { type: string, format: date, example: "2026-02-20" }
+                data_fim: { type: string, format: date, example: "2026-02-22" }
+                valor_total: { type: number, example: 70.00 }
+      responses:
+        '201':
+          description: Reserva realizada com sucesso
+        '422':
+          description: O item escolhido já está reservado nestas datas
+
+  /alugueis/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer }
+    put:
+      summary: Atualiza o status de um aluguel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status_pedido]
+              properties:
+                status_pedido: { type: string, example: "Concluído" }
+      responses:
+        '200':
+          description: Status do aluguel atualizado com sucesso
+        '404':
+          description: Registro de aluguel não encontrado
+    delete:
+      summary: Cancela/exclui o registro de um aluguel pendente
+      responses:
+        '200':
+          description: Aluguel removido/cancelado com sucesso
+        '400':
+          description: Aluguéis ativos ou concluídos não podem ser excluídos
