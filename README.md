@@ -12,3 +12,23 @@ Economia compartilhada:
 Ajuda a reduzir o consumo desnecessário e o desperdício.
 Renda extra: Donos de ferramentas ganham dinheiro com o que está parado.
 Baixo custo inicial: O foco é apenas no desenvolvimento do marketplace digital.
+
+
+
+Estrutura das Tabelas
+Cada usuário cadastrado no sistema terá os seus dados divididos em duas entidades principais para garantir a organização e o histórico do sistema:  
+  ┌────────────────────────┐                                         ┌────────────────────────┐
+  │      1. USUÁRIOS       │                                         │   2. MEU_INVENTÁRIO    │
+  ├────────────────────────┤                                         ├────────────────────────┤
+  │ id_usuario (PK)        │────────────────────────────────────────<│ id_item (PK)           │
+  │ nome, email, senha..   │                                         │ id_usuario (FK)        │
+  └────────────────────────┘                                         │ nome_item, preco...    │
+               │                                                     └────────────────────────┘
+               │
+               │                                                  ┌────────────────────────┐
+               │                                                  │  3. MEUS_ALUGUEIS      │
+               └────────────────────────<│├───────────────────────┤
+                                                                  │ id_aluguel (PK)        │
+                                                                  │ id_usuario (FK)        │
+                                                                  │ id_item (FK), datas... │
+                                                                  └────────────────────────┘
